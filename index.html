@@ -1,91 +1,386 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>India’s Elite Class – Flipbook Preview</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Flipbook — Classic Book Style</title>
 
   <style>
-    body {
-      margin: 0;
-      font-family: Georgia, serif;
-      background: #f2f2f2;
+    :root{
+      --bg:#ececec;
+      --paper:#fff;
+      --accent:#1f6feb;
+      --page-shadow: rgba(0,0,0,0.18);
+      --max-w:900px;
+    }
+    html,body{height:100%;margin:0;font-family: "Georgia", serif;background:var(--bg);color:#111}
+    .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:30px 18px;box-sizing:border-box}
+    .viewer{
+      width:100%;max-width:var(--max-w);height:75vh;min-height:420px;
+      perspective:2200px;
+      position:relative;
     }
 
-    .book-container {
-      width: 100%;
-      max-width: 900px;
-      margin: auto;
-      margin-top: 30px;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
+    /* Book shell */
+    .book-shell{
+      width:100%;height:100%;position:relative;margin:0 auto;display:flex;align-items:center;justify-content:center;
+    }
+    .book {
+      width:90%;
+      max-width:760px;
+      height:95%;
+      position:relative;
+      transform-style:preserve-3d;
+      margin:0 auto;
     }
 
+    /* each page */
     .page {
-      display: none;
-      font-size: 18px;
-      line-height: 1.6;
+      position:absolute;
+      width:50%;
+      height:100%;
+      top:0;
+      background:var(--paper);
+      box-shadow: 0 6px 18px var(--page-shadow);
+      overflow:auto;
+      -webkit-overflow-scrolling:touch;
+      backface-visibility:hidden;
+      transform-origin:left center;
+      border-left:1px solid rgba(0,0,0,0.04);
+      box-sizing:border-box;
+      padding:28px;
+      font-size:16px;
+      line-height:1.6;
     }
 
-    .active {
-      display: block;
+    /* left page */
+    .page.left{
+      left:0;
+      transform-origin:right center;
+      border-right:1px solid rgba(0,0,0,0.04);
     }
 
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      margin: 20px 5px;
-      border: none;
-      background: #007bff;
-      color: white;
-      border-radius: 6px;
+    /* right page */
+    .page.right{
+      left:50%;
+    }
+
+    /* front page layer ordering */
+    .page.front-left{z-index:50}
+    .page.front-right{z-index:60}
+
+    /* flipped state for right page (turning from right to left) */
+    .page.flip-right {
+      transform: rotateY(-180deg);
+      transition: transform 700ms cubic-bezier(.2,.9,.3,1);
+      z-index:40;
+    }
+
+    /* flipped state for left page (turning from left to right) */
+    .page.flip-left {
+      transform: rotateY(180deg);
+      transition: transform 700ms cubic-bezier(.2,.9,.3,1);
+      z-index:40;
+    }
+
+    /* page inner content */
+    .page .title{font-size:1.5rem;margin:0 0 10px;font-weight:700}
+    .page .content{font-size:1rem;margin-bottom:12px;color:#222}
+    .page img{max-width:100%;height:auto;border-radius:6px;margin:10px 0;display:block}
+
+    /* controls */
+    .controls{
+      width:90%;max-width:760px;margin:16px auto 0;display:flex;justify-content:space-between;gap:12px;
+    }
+    .controls .left, .controls .right {
+      display:flex;gap:8px;align-items:center;
+    }
+    .btn{
+      background:var(--accent);color:#fff;border:none;padding:10px 14px;border-radius:8px;font-weight:600;
+      box-shadow:0 6px 18px rgba(31,111,235,0.16);cursor:pointer;
+    }
+    .btn:disabled{opacity:0.5;cursor:default}
+    .btn.secondary{background:#e6eefc;color:var(--accent);box-shadow:none}
+    .page-num{align-self:center;color:#333;font-weight:600}
+
+    /* responsive */
+    @media (max-width:720px){
+      .viewer{height:78vh}
+      .page{padding:18px;font-size:15px}
+      .page .title{font-size:1.3rem}
+      .btn{padding:8px 12px;font-size:14px}
+      :root{--max-w:700px}
+    }
+
+    @media (max-width:420px){
+      /* single-column handling: show one page at a time */
+      .page{width:100%;left:0;transform-origin:center center}
+      .page.right{left:0}
+      .page.left{display:none}
+      .page.flip-right, .page.flip-left{transform:none}
+    }
+
+    /* subtle page edges */
+    .paper-edge{
+      position:absolute;inset:0;pointer-events:none;
+      background: linear-gradient(90deg, rgba(0,0,0,0.02), rgba(0,0,0,0) 10%);
+      mix-blend-mode: multiply;
+      opacity:0.6;
     }
   </style>
 </head>
-
 <body>
+  <div class="wrap">
+    <div style="width:100%;max-width:var(--max-w)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="font-weight:700;font-size:1.1rem">GBSB Flipbook Preview</div>
+        <div style="font-size:0.92rem;color:#444">Classic Book Style · Mobile friendly</div>
+      </div>
 
-<div class="book-container">
+      <div class="viewer" id="viewer">
+        <div class="book-shell">
+          <div class="book" id="book">
+            <!-- left and right pages will be injected here -->
+          </div>
+        </div>
+      </div>
 
-  <div id="p1" class="page active">
-    <h2>अध्याय 1</h2>
-    <p>यहाँ आपका पहला पेज...</p>
+      <div class="controls" aria-hidden="false">
+        <div class="left">
+          <button class="btn secondary" id="btnFirst" title="First">First</button>
+          <button class="btn secondary" id="btnPrev" title="Previous">← Prev</button>
+        </div>
+
+        <div class="page-num" id="pageIndicator">Page 1 / 6</div>
+
+        <div class="right">
+          <button class="btn secondary" id="btnNext" title="Next">Next →</button>
+          <button class="btn secondary" id="btnLast" title="Last">Last</button>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div id="p2" class="page">
-    <h2>अध्याय 2</h2>
-    <p>यहाँ आपका दूसरा पेज...</p>
-  </div>
+  <script>
+    /* 
+      Flipbook core data:
+      - pagesData: array of page objects {title, html, image?}
+      - On large screens, we render two pages (left,right). On small screens show single page.
+      - Add pages into pagesData (supports Hindi text).
+    */
 
-  <div id="p3" class="page">
-    <h2>अध्याय 3</h2>
-    <p>यहाँ आपका तीसरा पेज...</p>
-  </div>
+    const pagesData = [
+      { title: "अध्याय 1", html: "<p class='content'>यहाँ आपका पहला पृष्ठ — परिचय। आप यहां हिंदी या English लिख सकते हैं।</p>" },
+      { title: "अध्याय 2", html: "<p class='content'>यह दूसरा पृष्ठ — कहानी का आरम्भ।</p><p><img src='images/sample1.jpg' alt='sample image'></p>" },
+      { title: "अध्याय 3", html: "<p class='content'>यहाँ आपका तीसरा पेज...</p>" },
+      { title: "अध्याय 4", html: "<p class='content'>अध्याय 4 — कथानक आगे बढ़ता है।</p>" },
+      { title: "अध्याय 5", html: "<p class='content'>अध्याय 5 — कुछ और विवरण।</p>" },
+      { title: "अध्याय 6", html: "<p class='content'>अंतिम अध्याय — निष्कर्ष और नोट्स।</p>" }
+    ];
 
-  <button onclick="prevPage()">← Previous</button>
-  <button onclick="nextPage()">Next →</button>
+    // Important: If you want images, create folder `images/` in your repo and add files (e.g. sample1.jpg)
+    // Use relative paths like 'images/sample1.jpg'
 
-</div>
+    const book = document.getElementById('book');
+    const pageIndicator = document.getElementById('pageIndicator');
+    const btnPrev = document.getElementById('btnPrev');
+    const btnNext = document.getElementById('btnNext');
+    const btnFirst = document.getElementById('btnFirst');
+    const btnLast = document.getElementById('btnLast');
 
-<script>
-let current = 1;
+    // current page index (0-based).
+    // On desktop, pages are pairs: (0:left blank,1:right) then (2:left,3:right) etc.
+    // We'll treat currentPair as index of right page in a two-page spread.
+    let current = 0; // index of visible right page (0...pagesData.length-1)
 
-function showPage(n) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById("p" + n).classList.add('active');
-}
+    // render pages
+    function render() {
+      book.innerHTML = '';
 
-function nextPage() {
-  if (current < 3) current++;
-  showPage(current);
-}
+      const isMobile = window.matchMedia('(max-width:420px)').matches;
 
-function prevPage() {
-  if (current > 1) current--;
-  showPage(current);
-}
-</script>
+      if (isMobile) {
+        // Mobile: single page view
+        const pageEl = createPageElement(pagesData[current], 'right', 'front-right');
+        book.appendChild(pageEl);
+      } else {
+        // Desktop: two-pager
+        // compute left index = current-1 (if exists)
+        const leftIdx = current - 1;
+        const rightIdx = current;
 
+        // left page (if none, show blank cover)
+        const leftData = pagesData[leftIdx] || { title: ' ', html: '<p class="content"></p>' };
+        const rightData = pagesData[rightIdx] || { title: ' ', html: '<p class="content"></p>' };
+
+        const leftPage = createPageElement(leftData, 'left', 'front-left');
+        const rightPage = createPageElement(rightData, 'right', 'front-right');
+
+        book.appendChild(leftPage);
+        book.appendChild(rightPage);
+      }
+
+      updateControls();
+    }
+
+    function createPageElement(data, side, extraClass) {
+      const el = document.createElement('div');
+      el.className = `page ${side} ${extraClass||''}`;
+      el.innerHTML = `
+        <div class="title">${escapeHtml(data.title)}</div>
+        <div class="content">${data.html || ''}</div>
+      `;
+      return el;
+    }
+
+    function escapeHtml(str) {
+      // allow basic HTML (we pass html content intentionally), but sanitize basic dangerous characters
+      return String(str);
+    }
+
+    function updateControls() {
+      const total = pagesData.length;
+      const isMobile = window.matchMedia('(max-width:420px)').matches;
+
+      // page number display (1-based)
+      pageIndicator.textContent = isMobile
+        ? `Page ${current+1} / ${total}`
+        : `Pages ${Math.max(1,current)}–${current+1} / ${total}`;
+
+      btnPrev.disabled = (current <= 0);
+      btnFirst.disabled = (current <= 0);
+      btnNext.disabled = (current >= total-1);
+      btnLast.disabled = (current >= total-1);
+    }
+
+    // Flip animation handling for desktop
+    function flipTo(nextIndex) {
+      const total = pagesData.length;
+      if (nextIndex < 0 || nextIndex > total - 1) return;
+
+      const isMobile = window.matchMedia('(max-width:420px)').matches;
+      if (isMobile) {
+        current = nextIndex;
+        render();
+        return;
+      }
+
+      // desktop: animate page-turn
+      // If going forward (nextIndex > current) -> animate right page flip
+      // If going backward -> animate left page flip
+      const goingForward = nextIndex > current;
+
+      // create page elements for animation overlay
+      const leftIdx = current - 1;
+      const rightIdx = current;
+
+      // Build current visible set
+      book.innerHTML = '';
+
+      const leftData = pagesData[leftIdx] || { title:'', html:'' };
+      const rightData = pagesData[rightIdx] || { title:'', html:'' };
+
+      const leftPage = createPageElement(leftData,'left','front-left');
+      const rightPage = createPageElement(rightData,'right','front-right');
+
+      book.appendChild(leftPage);
+      book.appendChild(rightPage);
+
+      // Prepare the flipping page (a copy)
+      if (goingForward) {
+        // flip the right page (rotateY -180)
+        const flipping = createPageElement(rightData,'right','');
+        flipping.style.transition = 'transform 700ms cubic-bezier(.2,.9,.3,1)';
+        book.appendChild(flipping);
+
+        // small timeout to allow inserting before animation
+        requestAnimationFrame(()=> {
+          flipping.classList.add('flip-right');
+        });
+
+        // After animation finishes, set current=nextIndex and re-render
+        setTimeout(()=>{ current = nextIndex; render(); }, 720);
+      } else {
+        // going backward — flip left page (rotateY 180)
+        const leftFlipData = pagesData[nextIndex] || { title:'', html:'' };
+        const flipping = createPageElement(leftFlipData,'left','');
+        flipping.style.transition = 'transform 700ms cubic-bezier(.2,.9,.3,1)';
+        book.appendChild(flipping);
+
+        requestAnimationFrame(()=> {
+          flipping.classList.add('flip-left');
+        });
+
+        setTimeout(()=>{ current = nextIndex; render(); }, 720);
+      }
+    }
+
+    // navigation
+    btnPrev.addEventListener('click', ()=> {
+      const to = Math.max(0, current - 1);
+      flipTo(to);
+    });
+    btnNext.addEventListener('click', ()=> {
+      const to = Math.min(pagesData.length - 1, current + 1);
+      flipTo(to);
+    });
+    btnFirst.addEventListener('click', ()=> { flipTo(0); });
+    btnLast.addEventListener('click', ()=> { flipTo(pagesData.length - 1); });
+
+    // keyboard
+    document.addEventListener('keydown', (e)=>{
+      if (e.key === 'ArrowRight') btnNext.click();
+      if (e.key === 'ArrowLeft') btnPrev.click();
+    });
+
+    // touch swipe support
+    (function addSwipe(){
+      let startX=null, startY=null;
+      const el = document.getElementById('viewer');
+      el.addEventListener('touchstart', (ev)=> {
+        const t = ev.changedTouches[0];
+        startX = t.clientX;
+        startY = t.clientY;
+      }, {passive:true});
+      el.addEventListener('touchend', (ev)=> {
+        const t = ev.changedTouches[0];
+        if (startX === null) return;
+        const dx = t.clientX - startX;
+        const dy = t.clientY - startY;
+        if (Math.abs(dx) > 40 && Math.abs(dy) < 80) {
+          if (dx < 0) btnNext.click(); else btnPrev.click();
+        }
+        startX = null; startY = null;
+      }, {passive:true});
+    })();
+
+    // adjust when screen size changes (mobile vs desktop)
+    window.addEventListener('resize', ()=> {
+      // ensure current is valid
+      if (current >= pagesData.length) current = pagesData.length - 1;
+      render();
+    });
+
+    // initial setup
+    // Start with page 1 (index 0). For desktop we want the right page to be index 1
+    // so that first visible spread shows pages 1–2. We'll set current to 1 if possible.
+    (function init(){
+      if (window.matchMedia('(max-width:420px)').matches) {
+        current = 0;
+      } else {
+        current = Math.min(1, pagesData.length - 1);
+      }
+      render();
+    })();
+
+    // Helper: programmatic function to add page (if you want to update pages dynamically)
+    function addPage(title, html) {
+      pagesData.push({title, html});
+      render();
+    }
+
+    // Expose to console (for quick debug)
+    window.flipbook = { addPage, pagesData };
+  </script>
 </body>
-</html>
+  </html>
