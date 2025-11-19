@@ -1,97 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>India’s Elite Class – Flipbook Preview</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>India’s Elite Class – Flipbook Preview</title>
 
-<style>
-body {
-    margin: 0;
-    font-family: Georgia, serif;
-    background: #f2f2f2;
-}
+  <style>
+    body {
+      margin: 0;
+      font-family: Georgia, serif;
+      background: #f2f2f2;
+    }
 
-/* Flipbook container */
-.book {
-    width: 90%;
-    max-width: 500px;
-    height: 90vh;
-    margin: 20px auto;
-    perspective: 2000px;
-    position: relative;
-}
+    .book-container {
+      width: 100%;
+      max-width: 900px;
+      margin: auto;
+      margin-top: 30px;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+    }
 
-/* Pages */
-.page {
-    width: 100%;
-    height: 100%;
-    background: #fff;
-    position: absolute;
-    top: 0;
-    left: 0;
-    transform-origin: left;
-    transition: transform 1s;
-    box-shadow: 0 0 15px rgba(0,0,0,0.2);
-    padding: 20px;
-    box-sizing: border-box;
-    overflow-y: auto;
-}
+    .page {
+      display: none;
+      font-size: 18px;
+      line-height: 1.6;
+    }
 
-/* Button */
-.btn {
-    width: 90%;
-    margin: 20px auto;
-    text-align: center;
-}
-button {
-    padding: 12px 20px;
-    border: none;
-    background: #222;
-    color: white;
-    font-size: 18px;
-    border-radius: 8px;
-}
+    .active {
+      display: block;
+    }
 
-h2 {
-    margin-top: 0;
-}
-
-</style>
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 20px 5px;
+      border: none;
+      background: #007bff;
+      color: white;
+      border-radius: 6px;
+    }
+  </style>
 </head>
+
 <body>
 
-<div class="book">
-    <div class="page" id="p1">
-        <h2>भारत की सभी समस्याओं की जड़ — एलिट वर्ग</h2>
-        <p>यह उपन्यास भारत में सत्ता पर कब्जा जमाए बैठे उस वर्ग का सच दिखाता है जिसने भारतीयता को हमेशा दबाने की कोशिश की…</p>
-        <p>(Flip to next page)</p>
-    </div>
+<div class="book-container">
 
-    <div class="page" id="p2">
-        <h2>अध्याय 1: संविधान सभा का सच</h2>
-        <p>भारत की संविधान सभा दिखने में तो विविधता का उदाहरण लगती थी, पर वास्तविकता में वहाँ सत्ता-एलीट का कब्जा था…</p>
-    </div>
+  <div id="p1" class="page active">
+    <h2>अध्याय 1</h2>
+    <p>यहाँ आपका पहला पेज...</p>
+  </div>
 
-    <div class="page" id="p3">
-        <h2>अध्याय 2: भारतीयता बनाम सत्ता</h2>
-        <p>महर्षि वेदव्यास, सरदार पटेल, और अन्य पात्रों के संवाद इस उपन्यास में राजनैतिक मनोविज्ञान को उजागर करते हैं…</p>
-    </div>
-</div>
+  <div id="p2" class="page">
+    <h2>अध्याय 2</h2>
+    <p>यहाँ आपका दूसरा पेज...</p>
+  </div>
 
-<div class="btn">
-    <button onclick="nextPage()">Next Page →</button>
+  <div id="p3" class="page">
+    <h2>अध्याय 3</h2>
+    <p>यहाँ आपका तीसरा पेज...</p>
+  </div>
+
+  <button onclick="prevPage()">← Previous</button>
+  <button onclick="nextPage()">Next →</button>
+
 </div>
 
 <script>
 let current = 1;
 
-function nextPage() {
-    let page = document.getElementById('p' + current);
-    page.style.transform = "rotateY(-180deg)";
-    current++;
+function showPage(n) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById("p" + n).classList.add('active');
+}
 
-    if (current > 3) current = 1;
+function nextPage() {
+  if (current < 3) current++;
+  showPage(current);
+}
+
+function prevPage() {
+  if (current > 1) current--;
+  showPage(current);
 }
 </script>
 
