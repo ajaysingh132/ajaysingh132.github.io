@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Flipbook</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Georgia, serif;
+    background: #f2f2f2;
+}
+
+.container {
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto;
+    background: white;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    border-radius: 10px;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.page-text {
+    font-size: 18px;
+    line-height: 1.6;
+    padding: 10px;
+}
+
+.buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    background: #1976d2;
+    color: white;
+    font-size: 16px;
+    border-radius: 6px;
+}
+
+button:disabled {
+    background: #ccc;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2 id="pageTitle">अध्याय 1</h2>
+    <div id="pageContent" class="page-text"></div>
+
+    <div class="buttons">
+        <button onclick="prevPage()" id="prevBtn">← Previous</button>
+        <button onclick="nextPage()" id="nextBtn">Next →</button>
+    </div>
+</div>
+
+<script>
+// ---- PAGE DATA ----
+const pages = [
+    {
+        title: "अध्याय 1",
+        text: "यहाँ आपका पहला पेज…"
+    },
+    {
+        title: "अध्याय 2",
+        text: "यहाँ आपका दूसरा पेज…"
+    },
+    {
+        title: "अध्याय 3",
+        text: "यहाँ आपका तीसरा पेज…"
+    }
+];
+
+// ---- PAGE HANDLING ----
+let currentPage = 0;
+
+function loadPage() {
+    document.getElementById("pageTitle").innerText = pages[currentPage].title;
+    document.getElementById("pageContent").innerHTML = pages[currentPage].text;
+
+    document.getElementById("prevBtn").disabled = currentPage === 0;
+    document.getElementById("nextBtn").disabled = currentPage === pages.length - 1;
+}
+
+function nextPage() {
+    if (currentPage < pages.length - 1) {
+        currentPage++;
+        loadPage();
+    }
+}
+
+function prevPage() {
+    if (currentPage > 0) {
+        currentPage--;
+        loadPage();
+    }
+}
+
+// Load first page on open
+loadPage();
+</script>
+
+</body>
+      </html>
