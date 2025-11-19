@@ -1,1 +1,109 @@
 
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flipbook – Clean Version</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Georgia, serif;
+  background:#f2f2f2;
+}
+
+/* Book container */
+.book{
+  width:90%;
+  max-width:500px;
+  height:80vh;
+  margin:20px auto;
+  perspective:1500px;
+}
+
+/* Page */
+.page{
+  width:100%;
+  height:100%;
+  background:white;
+  position:absolute;
+  top:0;
+  left:0;
+  padding:25px;
+  box-sizing:border-box;
+  border-radius:6px;
+  box-shadow:0 0 15px rgba(0,0,0,0.2);
+  backface-visibility:hidden;
+  transform-origin:left;
+  transition:transform 0.8s ease;
+}
+
+/* Navigation buttons */
+nav{
+  width:100%;
+  text-align:center;
+  margin-top:20px;
+}
+button{
+  padding:10px 18px;
+  border:none;
+  background:#007bff;
+  color:white;
+  border-radius:5px;
+  margin:5px;
+  font-size:16px;
+}
+button:active{
+  opacity:0.7;
+}
+</style>
+</head>
+
+<body>
+
+<h2 style="text-align:center;">📘 भारत की समस्याओं का मूल — Flipbook</h2>
+
+<div class="book">
+  <div class="page" id="page1">
+    <h2>अध्याय 1</h2>
+    <p>यहाँ आपका पहला पेज...</p>
+  </div>
+
+  <div class="page" id="page2" style="transform: rotateY(180deg);">
+    <h2>अध्याय 2</h2>
+    <p>यहाँ आपका दूसरा पेज...</p>
+  </div>
+
+  <div class="page" id="page3" style="transform: rotateY(180deg);">
+    <h2>अध्याय 3</h2>
+    <p>यहाँ आपका तीसरा पेज...</p>
+  </div>
+</div>
+
+<nav>
+  <button onclick="prevPage()">← Previous</button>
+  <button onclick="nextPage()">Next →</button>
+</nav>
+
+<script>
+let current = 1;
+const pages = 3;
+
+function nextPage(){
+  if(current < pages){
+    document.getElementById("page"+current).style.transform = "rotateY(-180deg)";
+    current++;
+  }
+}
+
+function prevPage(){
+  if(current > 1){
+    current--;
+    document.getElementById("page"+current).style.transform = "rotateY(0deg)";
+  }
+}
+</script>
+
+</body>
+  </html>
